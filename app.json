@@ -1,15 +1,18 @@
 {
   "expo": {
-    "name": "around-app",
+    "name": "Around Fitness",
     "slug": "around-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "aroundapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ripledd.around",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,8 +21,12 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.ripledd.around"
     },
     "web": {
       "output": "static",
@@ -39,16 +46,39 @@
           }
         }
       ],
+      "@react-native-community/datetimepicker",
+      "expo-sqlite",
       [
-        "expo-location",
+        "expo-camera",
         {
-          "locationWhenInUsePermission": "Around uses your location to show what's happening nearby."
+          "cameraPermission": "Around uses your camera to snap photos of meals and scan barcodes."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Around uses your photo library so you can attach a picture to a logged meal."
+        }
+      ],
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "Around integrates with Health to keep your nutrition data in sync.",
+          "NSHealthUpdateUsageDescription": "Around writes the calories and macros you log to Health.",
+          "background": true
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b0301348-f192-4c9b-99bc-5c5737768939"
+      }
+    },
+    "owner": "eliaskofler"
   }
 }

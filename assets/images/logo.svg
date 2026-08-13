@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Around Fitness</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A84FF" />
+      <stop offset="100%" stop-color="#5E5CE6" />
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.16" />
+      <stop offset="55%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+    <radialGradient id="dot" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0%" stop-color="#6EE895" />
+      <stop offset="100%" stop-color="#30D158" />
+    </radialGradient>
+  </defs>
+
+  <!-- Full-bleed square — iOS/Android apply their own mask on top of this. -->
+  <rect width="1024" height="1024" fill="url(#bg)" />
+  <rect width="1024" height="1024" fill="url(#sheen)" />
+
+  <!--
+    The day's own progress ring, turned into a mark: an open circle swept
+    clockwise from twelve o'clock — "Around" as a full lap of the day — with
+    a bright dot leading the sweep the way the calorie ring glows green on
+    track.
+  -->
+  <circle
+    cx="512"
+    cy="512"
+    r="300"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-opacity="0.28"
+    stroke-width="72" />
+  <circle
+    cx="512"
+    cy="512"
+    r="300"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="72"
+    stroke-linecap="round"
+    stroke-dasharray="1884.96"
+    stroke-dashoffset="339.29"
+    transform="rotate(-90 512 512)" />
+
+  <circle cx="240.6" cy="384.3" r="58" fill="url(#dot)" />
+</svg>
