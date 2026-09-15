@@ -26,6 +26,7 @@ const CARBS_IDENTIFIER = 'HKQuantityTypeIdentifierDietaryCarbohydrates' as const
 const PROTEIN_IDENTIFIER = 'HKQuantityTypeIdentifierDietaryProtein' as const;
 const FAT_IDENTIFIER = 'HKQuantityTypeIdentifierDietaryFatTotal' as const;
 const WATER_IDENTIFIER = 'HKQuantityTypeIdentifierDietaryWater' as const;
+const WEIGHT_IDENTIFIER = 'HKQuantityTypeIdentifierBodyMass' as const;
 
 /** Active Energy Burned — read-only, there's nothing here for this app to write. */
 const BURNED_ENERGY_IDENTIFIER = 'HKQuantityTypeIdentifierActiveEnergyBurned' as const;
@@ -59,7 +60,7 @@ const WRITE_IDENTIFIERS = [
  * for it directly crashed the native authorization call outright (a
  * Swift-level trap, not a JS error try/catch can stop).
  */
-const READ_IDENTIFIERS = [...WRITE_IDENTIFIERS, BURNED_ENERGY_IDENTIFIER] as const;
+const READ_IDENTIFIERS = [...WRITE_IDENTIFIERS, BURNED_ENERGY_IDENTIFIER, WEIGHT_IDENTIFIER] as const;
 
 /**
  * Pulls one quantity (calories, or a macro's grams) out of a food
@@ -84,7 +85,7 @@ function readEnabled(): boolean {
 }
 
 /**
- * Asks HealthKit for read+write access to the four nutrition types. Several
+ * Asks HealthKit for nutrition and weight access. Several
  * things want this on mount now (the initial Health import, and the
  * background-delivery effect below) — single-flighted so they always await
  * the same underlying native call rather than firing `requestAuthorization`
@@ -94,10 +95,10 @@ function readEnabled(): boolean {
  */
 let authorizationRequest: Promise<void> | null = null;
 
-async function askForAuthorization(): Promise<void> {
+export async function askForAuthorization(): Promise<void> {
   if (!authorizationRequest) {
     authorizationRequest = requestAuthorization({
-      toShare: WRITE_IDENTIFIERS,
+      toShare: [...WRITE_IDENTIFIERS, WEIGHT_IDENTIFIER],
       toRead: READ_IDENTIFIERS,
     })
       .catch(() => {

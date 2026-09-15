@@ -1,13 +1,10 @@
-import { Href, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { AndroidSymbol, SFSymbol, SymbolView } from 'expo-symbols';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { SheetBody } from '@/components/sheet-body';
 import { ColorName, Radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-
-/** The route names a push accepts as a `pathname`, without query or hash. */
-type Pathname = Extract<Href, { pathname: string }>['pathname'];
 
 type Method = {
   id: string;
@@ -16,7 +13,7 @@ type Method = {
   icon: { ios: SFSymbol; android: AndroidSymbol; web: AndroidSymbol };
   color: ColorName;
   /** Where the tile leads. Left off while the method is still being built. */
-  route?: Pathname;
+  route?: '/manual-entry' | '/barcode-scan';
 };
 
 /** The ways a food can be logged, in the order the grid lays them out. */

@@ -14,7 +14,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { ThemePreferenceProvider } from '@/hooks/use-theme-preference';
 
 export const unstable_settings = {
-  anchor: 'index',
+  anchor: '(tabs)',
 };
 
 export default function RootLayout() {
@@ -68,9 +68,7 @@ function Navigator() {
           <FoodLogProvider>
             <NutritionGoalsProvider>
               <Stack screenOptions={{ headerShown: false }}>
-                {/* The day fills in its own `header` — it is the one that needs the
-                    day's state, and it sizes the bar itself. */}
-                <Stack.Screen name="index" />
+                <Stack.Screen name="(tabs)" />
                 {/* Sized to the grid of methods, which is all this one holds. */}
                 <Stack.Screen
                   name="add-food"

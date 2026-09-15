@@ -63,8 +63,8 @@
       [
         "@kingstinct/react-native-healthkit",
         {
-          "NSHealthShareUsageDescription": "Around integrates with Health to keep your nutrition data in sync.",
-          "NSHealthUpdateUsageDescription": "Around writes the calories and macros you log to Health.",
+          "NSHealthShareUsageDescription": "Around reads your nutrition and body weight from Health to display your progress.",
+          "NSHealthUpdateUsageDescription": "Around requests access to save the nutrition and body weight you log to Health.",
           "background": true
         }
       ]
