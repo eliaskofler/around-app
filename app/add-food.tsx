@@ -12,19 +12,12 @@ type Method = {
   caption: string;
   icon: { ios: SFSymbol; android: AndroidSymbol; web: AndroidSymbol };
   color: ColorName;
-  /** Where the tile leads. Left off while the method is still being built. */
-  route?: '/manual-entry' | '/barcode-scan';
+  /** Where the tile leads. */
+  route: '/manual-entry' | '/barcode-scan';
 };
 
 /** The ways a food can be logged, in the order the grid lays them out. */
 const METHODS: readonly Method[] = [
-  {
-    id: 'photo',
-    title: 'Snap to Track',
-    caption: 'Photograph the meal',
-    icon: { ios: 'camera.fill', android: 'photo_camera', web: 'photo_camera' },
-    color: 'green',
-  },
   {
     id: 'manual',
     title: 'Manual Entry',
@@ -32,13 +25,6 @@ const METHODS: readonly Method[] = [
     icon: { ios: 'square.and.pencil', android: 'edit', web: 'edit' },
     color: 'blue',
     route: '/manual-entry',
-  },
-  {
-    id: 'describe',
-    title: 'Describe by Text',
-    caption: 'Say what you ate',
-    icon: { ios: 'text.bubble.fill', android: 'chat_bubble', web: 'chat_bubble' },
-    color: 'purple',
   },
   {
     id: 'barcode',
@@ -57,14 +43,11 @@ export default function AddFood() {
 
   /** The day and section travel with the choice, whichever method takes it. */
   function open(method: Method) {
-    if (!method.route) return;
-
     router.push({ pathname: method.route, params });
   }
 
-  // Two rows of two rather than a wrapping row: the pairs keep equal widths
-  // without having to work a percentage around the gap between them.
-  const rows = [METHODS.slice(0, 2), METHODS.slice(2)];
+  // A single, balanced row: every shown route is usable today.
+  const rows = [METHODS];
 
   return (
     <>
@@ -85,22 +68,16 @@ export default function AddFood() {
 function MethodTile({ method, onPress }: { method: Method; onPress: () => void }) {
   const theme = useTheme();
   const tint = theme[method.color];
-  const ready = method.route !== undefined;
-
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={method.title}
-      accessibilityHint={ready ? undefined : 'Not available yet'}
-      accessibilityState={{ disabled: !ready }}
-      disabled={!ready}
       onPress={onPress}
       style={({ pressed }) => [
         styles.tile,
         {
           backgroundColor: theme.secondaryGroupedBackground,
-          // The methods still being built read as waiting rather than broken.
-          opacity: !ready ? 0.5 : pressed ? 0.6 : 1,
+          opacity: pressed ? 0.6 : 1,
         },
       ]}>
       <View style={[styles.badge, { backgroundColor: tint }]}>

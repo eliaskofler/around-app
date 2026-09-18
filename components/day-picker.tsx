@@ -1,7 +1,6 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
 import { GlassSurface } from '@/components/glass-surface';
@@ -34,11 +33,10 @@ type DayPickerProps = {
 /**
  * Calendar for picking the day being viewed.
  *
- * On Android `DateTimePicker` presents its own dialog, so it is rendered bare.
- * On iOS this is a calendar of our own rather than the native inline picker —
- * that's a bare `UIDatePicker` with no way to decorate individual days, and
- * the whole point here is a small progress ring on every day that has
- * something logged, hosted in the same glass card over a dimmed backdrop.
+ * This is intentionally a shared calendar rather than a platform-specific
+ * picker. Native date pickers look and behave differently across platforms,
+ * and neither lets us show the logged-day progress rings that make this
+ * control useful in the nutrition log.
  */
 export function DayPicker({
   visible,
@@ -52,25 +50,11 @@ export function DayPicker({
 
   if (!visible) return null;
 
-  if (Platform.OS !== 'ios') {
-    return (
-      <DateTimePicker
-        value={value}
-        mode="date"
-        display="calendar"
-        minimumDate={minimumDate}
-        maximumDate={maximumDate}
-        onValueChange={(_event, date) => onSelect(date)}
-        onDismiss={onClose}
-      />
-    );
-  }
-
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close calendar">
-        {/* Swallow taps on the card so they don't dismiss the modal. */}
-        <Pressable onPress={() => {}} style={styles.cardWrapper}>
+        {/* Keep calendar gestures inside the surface from bubbling to the backdrop. */}
+        <Pressable onPress={() => undefined} style={styles.cardWrapper} accessibilityViewIsModal>
           <GlassSurface style={styles.card} isInteractive={false}>
             <MonthCalendar
               value={value}
@@ -128,8 +112,8 @@ function MonthCalendar({ value, minimumDate, maximumDate, onSelect }: MonthCalen
   const gridStart = addDays(visibleMonth, -startOfMonth(visibleMonth).getDay());
   const days = Array.from({ length: WEEKS_SHOWN * 7 }, (_, index) => addDays(gridStart, index));
 
-  const canGoBack = startOfMonth(addMonths(visibleMonth, -1)) >= startOfMonth(minimumDate);
-  const canGoForward = startOfMonth(addMonths(visibleMonth, 1)) <= startOfMonth(maximumDate);
+  const canGoBack = startOfMonth(addMonths(visibleMonth, -1)).getTime() >= startOfMonth(minimumDate).getTime();
+  const canGoForward = startOfMonth(addMonths(visibleMonth, 1)).getTime() <= startOfMonth(maximumDate).getTime();
 
   return (
     <View>
@@ -153,7 +137,8 @@ function MonthCalendar({ value, minimumDate, maximumDate, onSelect }: MonthCalen
         {WEEKDAY_LABELS.map((label, index) => (
           <Text
             key={index}
-            style={[styles.weekdayLabel, { color: theme.tertiaryLabel }]}>
+            style={[styles.weekdayLabel, { color: theme.tertiaryLabel }]}
+            accessibilityElementsHidden>
             {label}
           </Text>
         ))}
@@ -167,7 +152,7 @@ function MonthCalendar({ value, minimumDate, maximumDate, onSelect }: MonthCalen
             inCurrentMonth={isSameMonth(date, visibleMonth)}
             isToday={isSameDay(date, today)}
             isSelected={isSameDay(date, value)}
-            disabled={date < minimumDate || date > maximumDate}
+            disabled={!isDateInRange(date, minimumDate, maximumDate)}
             calories={totalCalories(entriesOn(toDateKey(date)))}
             goalCalories={goals.calories}
             onPress={onSelect}
@@ -176,6 +161,13 @@ function MonthCalendar({ value, minimumDate, maximumDate, onSelect }: MonthCalen
       </View>
     </View>
   );
+}
+
+/** Compare date-only values so a non-midnight bound can never disable its own day. */
+function isDateInRange(date: Date, minimumDate: Date, maximumDate: Date): boolean {
+  const normalized = addDays(date, 0).getTime();
+
+  return normalized >= addDays(minimumDate, 0).getTime() && normalized <= addDays(maximumDate, 0).getTime();
 }
 
 function NavButton({
@@ -265,8 +257,9 @@ function DayCell({
       onPress={() => onPress(date)}
       accessibilityRole="button"
       accessibilityLabel={formatFullDate(date)}
+      accessibilityHint={disabled ? 'Unavailable' : isSelected ? 'Selected day' : 'View this day'}
       accessibilityState={{ selected: isSelected, disabled }}
-      style={({ pressed }) => [styles.cell, { opacity: pressed ? 0.6 : 1 }]}>
+      style={({ pressed }) => [styles.cell, { opacity: pressed && !disabled ? 0.55 : 1 }]}>
       <View style={styles.cellInner}>
         {hasEntries ? (
           <Svg width={RING_SIZE} height={RING_SIZE} style={StyleSheet.absoluteFill}>
@@ -315,17 +308,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
+    paddingVertical: 24,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   cardWrapper: {
     // Shadows need room to breathe; the card itself must not clip.
     padding: 4,
+    width: '100%',
+    maxWidth: 440,
+    alignSelf: 'center',
   },
   card: {
     borderRadius: Radius.large + 8,
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 4,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 6,
   },
   divider: {
     height: StyleSheet.hairlineWidth,
@@ -350,9 +347,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    paddingTop: 10,
-    paddingBottom: 4,
+    minHeight: 44,
+    paddingHorizontal: 2,
+    paddingBottom: 8,
   },
   monthLabel: {
     fontSize: 17,
@@ -361,13 +358,14 @@ const styles = StyleSheet.create({
   },
   weekdayRow: {
     flexDirection: 'row',
-    paddingTop: 8,
+    paddingBottom: 6,
   },
   weekdayLabel: {
     width: `${100 / 7}%`,
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
+    letterSpacing: 0.3,
   },
   grid: {
     flexDirection: 'row',
@@ -375,7 +373,7 @@ const styles = StyleSheet.create({
   },
   cell: {
     width: `${100 / 7}%`,
-    aspectRatio: 1,
+    height: 42,
     alignItems: 'center',
     justifyContent: 'center',
   },

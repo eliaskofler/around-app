@@ -13,10 +13,6 @@ import { NutritionGoalsProvider } from '@/hooks/use-nutrition-goals';
 import { useTheme } from '@/hooks/use-theme';
 import { ThemePreferenceProvider } from '@/hooks/use-theme-preference';
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
 export default function RootLayout() {
   // Outside the navigator: the preference has to be applied to the native
   // trait collection before anything below reads `useColorScheme`.
@@ -68,7 +64,7 @@ function Navigator() {
           <FoodLogProvider>
             <NutritionGoalsProvider>
               <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="nutrition" />
                 {/* Sized to the grid of methods, which is all this one holds. */}
                 <Stack.Screen
                   name="add-food"
