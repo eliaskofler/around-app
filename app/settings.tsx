@@ -1,7 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
-import { StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Linking, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FormFooterText, FormGroup, FormRow } from '@/components/form';
@@ -178,6 +178,11 @@ export default function Settings() {
         </FormGroup>
 
         <FormGroup>
+          <FormRow
+            label="Privacy Policy"
+            chevron
+            onPress={() => Linking.openURL('https://around.ripledd.com/privacy')}
+          />
           <FormRow label="Terms of Service" chevron onPress={() => router.push('/terms')} />
         </FormGroup>
       </SheetBody>
